@@ -57,13 +57,13 @@ console.log(Array.apply(null, aaa)); */ // [undefined, undefined, "a", undefined
 
 // 3.Function.prototype.bind()  ，bind 用于将函数体内的this绑定到某个对象，然后返回一个新函数
 var d = new Date();
-d.getTime();
+// d.getTime();
 
 // var print = d.getTime;
 // print(); // Uncaught TypeError: this is not a Date object.
 // 报错是因为，d.getTime 赋值给 print 后，getTime 内部的this 指向方式变化，已经不再指向Date 对象实例了
-var print = d.getTime.bind(d);
-console.log(print());
+var print = d.getTime.call(d);
+console.log(print);
 
 /* var add = function (x, y) {
   console.log(x * this.m + y * this.n);
@@ -78,14 +78,14 @@ newAdd(5);  */ // 20
 2. bind 每次执行产生一个新函数，call、apply 不会
 3. call ,bind 接收多个参数绑定到函数，参数单一传入，apply 接收方式为数组 */
 
-function Parent(name, money) {
+/* function Parent(name, money) {
   this.name = name;
   this.money = money;
   this.info = function () {
     console.log("姓名： " + this.name + " 钱： " + this.money);
   };
 }
-//定义孩子类
+//定义子类
 function Children(...para) {
   Parent.apply(this, para); // 全部继承
   this.age = 99;
@@ -93,4 +93,140 @@ function Children(...para) {
 //实例化类
 var chi = new Children("child", 800);
 chi.info();
-console.log(chi.age);
+console.log(chi.age); */
+
+/* function Component() {
+  this.id = Math.random().toString(36).slice(-5);
+  Object.defineProperty(this, "id", {
+    writable: false
+  });
+}
+function SubComponent() {
+  Component.call(this);
+}
+SubComponent.prototype = Component.prototype;
+const com = new SubComponent();
+com.id = 3;
+console.log(com.id); */
+
+/* class Component {
+  constructor() {
+    this.id = Math.random().toString(36).slice(-5);
+    Object.defineProperty(this, "id", {
+      writable: false
+    });
+  }
+}
+class SubComponent extends Component {}
+const com = new SubComponent();
+com.id = 3;
+console.log(com.id); */
+
+// object.defineProperty 方法在构造函数里显得那么格格不入。有没有更优雅的写法呢？不妨试试 ES6 新的语法 Proxy？
+
+class Component {
+  constructor() {
+    this.proxy = new Proxy(
+      {
+        id: Math.random().toString(36).slice(-5)
+      },
+      {
+        set(target, key, value) {
+          return false;
+        }
+      }
+    );
+  }
+
+  get id() {
+    return this.proxy.id;
+  }
+}
+//  proxy 下面可以放很多跟 id 一样的内容，这样我们就不会一个一个用 Object.defineProperty 去显示的定义“只读”。用 class getter + proxy 的方式写起来更简洁
+
+const com = new Component();
+com.proxy.id = 4; // 这样写会修改id的值，如果设置set的话，就不会修改了...
+com.id = 3;
+console.log(com.id);
+
+// 这段代码将target对象保护起来，对外暴露proxy变量，这样对target对象的操作都要经过代理层proxy，在代理层可以设置各种规则进而完成对target的保护。这个看上去没什么用，其实不然，设想一下一些核心的数据可以封装在target对象，数据校验放在proxy来做，这样用户是不能直接操作核心数据的进而保证了代码安全。
+let target = {
+  foo: "Welcome, foo"
+};
+let proxy = new Proxy(target, {
+  get(receiver, name) {
+    return name in receiver ? receiver[name] : `Hello, ${name}`;
+  }
+});
+console.log(proxy.foo === "Welcome, foo");
+console.log(proxy.world === "Hello, world");
+
+/* const date = "2021-06-07";
+const t = date.match(/(\d{4})-(\d{2})-(\d{2})/);
+console.log(t);
+// ES9 开始支持正则表达式的分组命名捕获
+const t1 = date.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
+console.log(t1); */
+console.log("-----------------------------------------------------------");
+// Shape - 父类(superclass)
+function Shape() {
+  this.x = 66;
+  this.y = 2;
+}
+// 父类的方法
+Shape.prototype.move = function (x, y) {
+  this.x += x;
+  this.y += y;
+  console.info(this.x); // 116
+  console.info("Shape moved.");
+};
+// Rectangle - 子类(subclass)
+function Rectangle() {
+  Shape.call(this); // call super constructor.
+}
+// 子类续承父类  Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。
+// 可选。需要传入一个对象，该对象的属性类型参照Object.defineProperties()的第二个参数。如果该参数被指定且不为 undefined，该传入对象的自有可枚举属性(即其自身定义的属性，而不是其原型链上的枚举属性)将为新创建的对象添加指定的属性值和对应的属性描述符。
+Rectangle.prototype = Object.create(Shape.prototype, {
+  property1: {
+    value: true,
+    writable: true
+  },
+  property2: {
+    value: "Hello-tt",
+    writable: false
+  },
+  bar: {
+    configurable: false,
+    get: function () {
+      return this.x;
+    },
+    set: function (value) {
+      console.log("Setting `o.bar` to", value);
+      this.x = value;
+    }
+  }
+});
+Rectangle.prototype.constructor = Rectangle;
+
+var rect = new Rectangle();
+
+// console.log(rect instanceof Rectangle); // true
+// console.log(rect instanceof Shape); // true
+// console.log(rect.property2); // Hello-tt
+/* console.log(rect.bar); // 66
+rect.bar = 99;
+console.log(rect.bar); // 99
+rect.move(17, 1); */ // Outputs, 'Shape moved.'
+
+/* var obj = {};
+Object.defineProperties(obj, {
+  property1: {
+    value: true,
+    writable: true
+  },
+  property2: {
+    value: "Hello",
+    writable: false
+  }
+});
+console.log(obj.property2); */ // Hello

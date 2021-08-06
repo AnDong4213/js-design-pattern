@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iterator</title>
+  </head>
+  <body>
+    <h1>Iterator</h1>
+
+    <script>
+      let authors = {
+        allAuthors: {
+          fiction: ["Agatha Christie", "J. K. Rowling", "Dr. Seuss"],
+          scienceFiction: [
+            "Neal Stephenson",
+            "Arthur Clarke",
+            "Isaac Asimov",
+            "Robert Heinlein"
+          ],
+          fantasy: ["J. R. R. Tolkien", "J. K. Rowling", "Terry Pratchett"]
+        }
+      };
+
+      // 对 authors 进行遍历并得到所有作者的名单
+      /* for (let author of authors) {
+        console.log(author);  // Uncaught TypeError: authors is not iterable
+      } */
+
+      /* for (let key in authors) {
+        let r = [];
+        for (let k in authors[key]) {
+          r = r.concat(authors[key][k]);
+        }
+        console.log(r);
+      } */
+
+      // 在JS开发过程中，对数据的遍历是家常便饭，然而我们不得不借助与数组，Object对象等内置的数据结构，如果我们自行定义较复杂的数据结构，让该数据结构具备遍历接口岂不是快哉？ES6的遍历器让其变的可行而且简单
+
+      // ES6 增加了 Iterator 让任意数据结构可以实现自定义遍历器
+      authors[Symbol.iterator] = function () {
+        let allAuthors = this.allAuthors;
+        let keys = Reflect.ownKeys(allAuthors);
+        let values = [];
+        return {
+          next() {
+            if (!values.length) {
+              if (keys.length) {
+                values = allAuthors[keys[0]];
+                keys.shift();
+              }
+            }
+            return {
+              done: !values.length,
+              value: values.shift()
+            };
+          }
+        };
+      };
+
+      // 我们只需要对 authors 这个数据结构增加 Iterator 遍历器接口即可用 for…of 的方式来遍历了，浏览器不再报错了
+      let authorList = [];
+      for (let author of authors) {
+        authorList.push(author);
+      }
+      console.log(authorList);
+
+      let fibonacci = {
+        [Symbol.iterator]() {
+          let pre = 0,
+            cur = 1;
+          return {
+            next() {
+              [pre, cur] = [cur, pre + cur];
+              return { done: false, value: cur };
+            }
+          };
+        }
+      };
+
+      for (let n of fibonacci) {
+        if (n > 1000) break;
+        console.log(n);
+      }
+
+      /* const aas = [];
+      for (let n of "fibonaci") {
+        aas.push(n);
+        console.log(n);
+      }
+      console.log(aas);  */ // ["f", "i", "b", "o", "n", "a", "c", "i"]
+
+      window.a = 3;
+      function test() {
+        console.log(this.a);
+      }
+
+      test.bind({ a: 2 })(); // 2
+      test(); // 3
+    </script>
+  </body>
+</html>
