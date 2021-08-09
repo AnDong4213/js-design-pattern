@@ -179,3 +179,11 @@
   // ES2020 在语言标准的层面，引入globalThis作为顶层对象。也就是说，任何环境下，globalThis都是存在的，都可以从它拿到顶层对象，指向全局环境下的this。
   console.log(globalThis); // Window
 }
+
+const s = new Set();
+
+[2, 3, 5, 4, 5, 2, 2].forEach((x) => s.add(x));
+
+for (let i of s) {
+  console.log(i);
+}
