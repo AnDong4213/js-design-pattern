@@ -8,7 +8,8 @@ for (let i of s) {
   console.log(i);
 }
 console.log(s.size); // 4
-console.log(Object.entries(s));  */ // []
+console.log(Object.entries(s)); // []
+console.log(s.entries());  */ // SetIterator {2 => 2, 3 => 3, 5 => 5, 4 => 4}
 
 // Set函数可以接受一个数组（或者具有 iterable 接口的其他数据结构）作为参数，用来初始化。
 /* const set = new Set([1, 2, 3, 4, 4]); // 数组去重
@@ -62,8 +63,10 @@ Set.prototype.forEach()：使用回调函数遍历每个成员 */
 // Set的遍历顺序就是插入顺序。这个特性有时非常有用，比如使用 Set 保存一个回调函数列表，调用时就能保证按照添加顺序调用。
 
 // keys方法、values方法、entries方法返回的都是遍历器对象（详见《Iterator 对象》一章）。由于 Set 结构没有键名，只有键值（或者说键名和键值是同一个值），所以keys方法和values方法的行为完全一致。
-/* let set = new Set(["red", "green", "blue"]);
-for (let item of set.keys()) {
+let set = new Set(["red", { green: "green" }, "blue"]);
+set.add({ pink: "pink" });
+set.add(77);
+/* for (let item of set.keys()) {
   console.log(item);
 }
 for (let item of set.values()) {
@@ -71,20 +74,33 @@ for (let item of set.values()) {
 }
 for (let item of set.entries()) {
   console.log(item); // ["red", "red"]
-}
+} */
 // Set 结构的实例默认可遍历，它的默认遍历器生成函数就是它的values方法。
 // console.log(Set.prototype[Symbol.iterator] === Set.prototype.values); // true
 // 可以省略values方法，直接用for...of循环遍历 Set
-for (let x of set) {
+/* for (let x of set) {
   console.log(x);
-}
+} */
+console.log(set);
 // Set 结构的实例与数组一样，也拥有forEach方法，用于对每个成员执行某种操作，没有返回值。Set 结构的键名就是键值（两者是同一个值），因此第一个参数与第二个参数的值永远都是一样的。
 set.forEach((value, key) => {
   console.log(key + " : " + value); // red : red
+  value.pink ? (value.pink = 99) : "";
+  value.green ? (value.green = 888) : "";
 });
+console.log([...set]);
 
+const set5 = new Set();
+set5.add({ t: 1 });
+console.log(set5);
+set5.forEach((value, key) => {
+  console.log(key, value);
+  value.t ? (value.t = 99) : "";
+});
+console.log(set5);
+console.log([...set5]);
 // （3）遍历的应用
-// 扩展运算符（...）内部使用for...of循环，所以也可以用于 Set 结构。 */
+// 扩展运算符（...）内部使用for...of循环，所以也可以用于 Set 结构。
 
 // Set 可以很容易地实现并集（Union）、交集（Intersect）和差集（Difference）。数组的map和filter方法也可以间接用于 Set 了。
 /* let a = new Set([1, 2, 3]);
@@ -189,7 +205,9 @@ const map = new Map([
   ["F", "no"],
   ["T", "yes"]
 ]);
-console.log(map); // {"F" => "no", "T" => "yes"}
+map.set("t", 88);
+map.set("T", "修改T的值");
+console.log(map); // {"F" => "no", "T" => "修改T的值", "t" => 88}
 /* for (let i of map) {
   console.log(i);
 }
@@ -210,7 +228,118 @@ console.log([...map]); */ // [Array(2), Array(2)]
 const map0 = new Map().set(1, "a").set(2, "b").set(3, "c");
 console.log(map0); // Map(3) {1 => "a", 2 => "b", 3 => "c"}
 const map1 = new Map([...map0].filter(([k, v]) => k < 3));
-console.log(map1); // Map(2) {1 => "a", 2 => "b"}
+console.log("haha: %s", map1); // Map(2) {1 => "a", 2 => "b"}
 map0.forEach((value, key, map) => {
   console.log("Key-q: %s, Value-q: %s", key, value); // Key-q: 1, Value-q: a
 });
+
+//  与其他数据结构的互相转换
+// （1）Map 转为数组。 Map 转为数组最方便的方法，就是使用扩展运算符（...）。
+
+// （2）数组 转为 Map。   将数组传入 Map 构造函数，就可以转为 Map。
+
+// (3) Map 转为对象。 如果所有 Map 的键都是字符串，它可以无损地转为对象。
+// 如果有非字符串的键名，那么这个键名会被转成字符串，再作为对象的键名。
+// console.log([...map0]); // {1: "a", 2: "b", 3: "c"}
+// console.log(Object.fromEntries([...map0]));
+function strMapToObj(strMap) {
+  let obj = Object.create(null);
+  for (let [k, v] of strMap) {
+    obj[k] = v;
+  }
+  return obj;
+}
+
+// （4）对象转为 Map  对象转为 Map 可以通过Object.entries()。
+function objToStrMap(obj) {
+  let strMap = new Map();
+  for (let k of Object.keys(obj)) {
+    strMap.set(k, obj[k]);
+  }
+  return strMap;
+}
+
+// （5）Map 转为 JSON
+function strMapToJson(strMap) {
+  return JSON.stringify(strMapToObj(strMap));
+}
+let myMap = new Map().set("yes", true).set("no", false);
+console.log(strMapToJson(myMap));
+// 另一种情况是，Map 的键名有非字符串，这时可以选择转为数组 JSON。
+
+// （6）JSON 转为 Map
+function jsonToStrMap(jsonStr) {
+  return objToStrMap(JSON.parse(jsonStr));
+}
+console.log(jsonToStrMap('{"yes": true, "no": false}'));
+
+console.log("------------------------------------------------");
+
+// WeakMap结构与Map结构类似，也是用于生成键值对的集合。
+const wm1 = new WeakMap();
+const key = { foo: 1 };
+wm1.set(key, { a: 8 });
+console.log(wm1.get(key)); // {a: 8}
+
+// WeakMap 也可以接受一个数组，作为构造函数的参数
+const k1 = [1, 2, 3];
+const k2 = [4, 5, 6];
+const wm2 = new WeakMap([
+  [k1, "foo"],
+  [k2, "bar"]
+]);
+console.log(wm2.get(k2)); // bar
+
+// WeakMap与Map的区别有两点。 首先，WeakMap只接受对象作为键名（null除外），不接受其他类型的值作为键名
+// 其次，WeakMap的键名所指向的对象，不计入垃圾回收机制。
+
+// WeakMap的设计目的在于，有时我们想在某个对象上面存放一些数据，但是这会形成对于这个对象的引用。
+// WeakMap 就是为了解决这个问题而诞生的，它的键名所引用的对象都是弱引用，即垃圾回收机制不将该引用考虑在内。
+// WeakMap的专用场合就是，它的键所对应的对象，可能会在将来消失。WeakMap结构有助于防止内存泄漏。
+
+// 注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
+
+// WeakMap 与 Map 在 API 上的区别主要是两个，一是没有遍历操作（即没有keys()、values()和entries()方法），也没有size属性。
+// 二是无法清空，即不支持clear方法。因此，WeakMap只有四个方法可用：get()、set()、has()、delete()。
+
+//WeakMap 应用的典型场合就是 DOM 节点作为键名。
+let myWeakmap = new WeakMap();
+myWeakmap.set(document.getElementById("logo"), { timesClicked: 0 });
+document.getElementById("logo").addEventListener(
+  "click",
+  function () {
+    let logoData = myWeakmap.get(document.getElementById("logo"));
+    logoData.timesClicked++;
+    uu();
+  },
+  false
+);
+function uu() {
+  console.log(myWeakmap.get(document.getElementById("logo")));
+}
+
+// 能使用map不使用数组，优先使用map和set
+// 5,WeakRef。 // WeakSet 和 WeakMap 是基于弱引用的数据结构，ES2021 更进一步，提供了 WeakRef 对象，用于直接创建对象的弱引用。
+let target = { a: 1 };
+let wr = new WeakRef(target);
+
+let obj = wr.deref();
+console.log(obj); // {a: 1}
+if (obj) {
+  // target 未被垃圾回收机制清除
+  // ...
+}
+
+var person = {
+  name: "张三"
+};
+var proxy = new Proxy(person, {
+  get: function (target, propKey) {
+    if (propKey in target) {
+      return target[propKey];
+    } else {
+      throw new ReferenceError('Prop name "' + propKey + '" does not exist.');
+    }
+  }
+});
+console.log(proxy.name);
