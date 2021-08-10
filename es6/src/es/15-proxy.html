@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>proxy</title>
+  </head>
+  <body>
+    <script>
+      // 利用 Proxy，可以将读取属性的操作（get），转变为执行某个函数，从而实现属性的链式操作
+      var pipe = function (value) {
+        var funcStack = [];
+        var oproxy = new Proxy(
+          {},
+          {
+            get: function (_, fnName) {
+              console.log("fnName", fnName);
+              if (fnName === "get") {
+                return funcStack.reduce((val, fn) => {
+                  return fn(val);
+                }, value);
+              }
+              funcStack.push(window[fnName]);
+              return oproxy;
+            }
+          }
+        );
+        return oproxy;
+      };
+
+      var double = (n) => n * 2;
+      var pow = (n) => n * n;
+      var reverseInt = (n) => n.toString().split("").reverse().join("") | 0;
+
+      console.log(pipe(4).double.pow.reverseInt.get); // 46
+      console.log(self);
+    </script>
+  </body>
+</html>
