@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>other</title>
+  </head>
+  <body>
+    <script>
+      // Object.getOwnPropertyDescriptors()也可以用来实现 Mixin（混入）模式。
+      let mix = (object) => ({
+        with: (...mixins) =>
+          mixins.reduce(
+            (c, mixin) =>
+              Object.create(c, Object.getOwnPropertyDescriptors(mixin)),
+            object
+          )
+      });
+
+      // multiple mixins example
+      let a = { a: "a" };
+      let b = { b: "b" };
+      let c = { c: "c" };
+      let d = mix(c).with(a, b);
+      console.log(d.a);
+      console.log(d.b);
+      console.log(d.c);
+
+      console.log("--------------------------------------------------");
+
+      const map2 = new Map();
+      map2.set("age", 99).set("name", "haha").set("sex", 1);
+      console.log(map2);
+      console.log([...map2]); // [Array(2), Array(2), Array(2)]
+      // Object.fromEntries()方法是Object.entries()的逆操作，用于将一个键值对数组转为对象。
+      console.log(Object.fromEntries(map2)); // {age: 99, name: "haha", sex: 1}
+
+      const URLp = new URLSearchParams("?foo=bar&baz=qux&yy");
+      console.log(URLp); // URLSearchParams {}
+      console.log(URLp.get("foo"));
+      console.log(URLp.getAll("foo")); // ["bar"]
+      console.log([...URLp]); // [Array(2), Array(2), Array(2)]
+      console.log(new Map(URLp)); // {"foo" => "bar", "baz" => "qux", "yy" => ""}
+      console.log(Object.fromEntries(URLp)); // {foo: "bar", baz: "qux", yy: ""}
+    </script>
+  </body>
+</html>
