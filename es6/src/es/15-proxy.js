@@ -297,11 +297,12 @@ instanceof */
 
 // ownKeys() ----
 /* ownKeys()方法用来拦截对象自身属性的读取操作。具体来说，拦截以下操作。
-Object.getOwnPropertyNames()
-Object.getOwnPropertySymbols()
-Object.keys()
-for...in循环 */
-let target = {
+  Object.getOwnPropertyNames()
+  Object.getOwnPropertySymbols()
+  Object.keys()
+  for...in循环 
+*/
+/* let target = {
   _bar: "foo",
   _prop: "bar",
   prop: "baz"
@@ -312,5 +313,121 @@ let handler = {
   }
 };
 let proxy = new Proxy(target, handler);
-console.log(proxy);
-console.log(Object.keys(proxy));
+console.log(proxy); // Proxy {_bar: "foo", _prop: "bar", prop: "baz"}
+console.log(Object.keys(proxy)); */ // ["prop"]
+
+// 使用Object.keys()方法时，有三类属性会被ownKeys()方法自动过滤，不会返回。
+/*   目标对象上不存在的属性
+  属性名为 Symbol 值
+  不可遍历（enumerable）的属性 */
+// 示例见 other.html
+
+// for...in循环也受到ownKeys()方法的拦截。
+/* const obj = { hello: "world" };
+const proxy = new Proxy(obj, {
+  ownKeys: function () {
+    return ["a", "b"];
+  }
+});
+for (let key in proxy) {
+  console.log(key); // 没有任何输出
+} */
+
+// ownKeys()方法返回的数组成员，只能是字符串或 Symbol 值。如果有其他类型的值，或者返回的根本不是数组，就会报错。
+
+// 如果目标对象自身包含不可配置的属性，则该属性必须被ownKeys()方法返回，否则报错。
+/* var obj = {};
+Object.defineProperty(obj, "a", {
+  configurable: false,
+  enumerable: true,
+  value: 10
+});
+var p = new Proxy(obj, {
+  ownKeys: function (target) {
+    return ["b"];
+  }
+});
+console.log(Object.getOwnPropertyNames(p)); */
+// 上面代码中，obj对象的a属性是不可配置的，这时ownKeys()方法返回的数组之中，必须包含a，否则会报错。
+
+// 另外，如果目标对象是不可扩展的（non-extensible），这时ownKeys()方法返回的数组之中，必须包含原对象的所有属性，且不能包含多余的属性，否则报错。
+
+// preventExtensions() ----
+// preventExtensions()方法拦截Object.preventExtensions()。该方法必须返回一个布尔值，否则会被自动转为布尔值。
+
+// setPrototypeOf() ----   setPrototypeOf()方法主要用来拦截Object.setPrototypeOf()方法。
+/* var handler = {
+  setPrototypeOf(target, proto) {
+    throw new Error("Changing the prototype is forbidden");
+  }
+};
+var proto = {};
+var target = function () {};
+var proxy = new Proxy(target, handler);
+Object.setPrototypeOf(proxy, proto);
+console.log(Object.getPrototypeOf(proxy)); */
+// 该方法只能返回布尔值，否则会被自动转为布尔值。另外，如果目标对象不可扩展（non-extensible），setPrototypeOf()方法不得改变目标对象的原型。
+
+// 3,Proxy.revocable()   Proxy.revocable()方法返回一个可取消的 Proxy 实例。
+/* let target = {};
+let handler = {};
+
+let { proxy, revoke } = Proxy.revocable(target, handler);
+
+proxy.foo = 123;
+console.log(proxy.foo); // 123
+
+revoke();
+console.log(proxy.foo); */
+// Proxy.revocable()方法返回一个对象，该对象的proxy属性是Proxy实例，revoke属性是一个函数，可以取消Proxy实例。上面代码中，当执行revoke函数之后，再访问Proxy实例，就会抛出一个错误。
+
+// 4, this 问题
+// 虽然 Proxy 可以代理针对目标对象的访问，但它不是目标对象的透明代理，即不做任何拦截的情况下，也无法保证与目标对象的行为一致。主要原因就是在 Proxy 代理的情况下，目标对象内部的this关键字会指向 Proxy 代理
+/* const target = {
+  m: function () {
+    console.log(this === proxy1);
+  }
+};
+const handler = {};
+const proxy1 = new Proxy(target, handler);
+
+target.m(); // false
+proxy1.m(); */ // true
+// 一旦proxy代理target，target.m()内部的this就是指向proxy，而不是target。
+
+// 由于this指向的变化，导致 Proxy 无法代理目标对象。
+/* const _name = new WeakMap();
+class Person {
+  constructor(name) {
+    _name.set(this, name);
+  }
+  get name() {
+    return _name.get(this);
+  }
+}
+
+const jane = new Person("Jane");
+console.log(jane.name); // 'Jane'
+
+const proxy = new Proxy(jane, {});
+console.log(proxy.name); */ // undefined
+// 目标对象jane的name属性，实际保存在外部WeakMap对象_name上面，通过this键区分。由于通过proxy.name访问时，this指向proxy，导致无法取到值，所以返回undefined。
+
+/* const handler = {
+  get: function (target, key, receiver) {
+    console.log(this === handler);
+    return "Hello, " + key;
+  },
+  set: function (target, key, value) {
+    console.log(this === handler);
+    target[key] = value;
+    return true;
+  }
+};
+const proxy = new Proxy({}, handler);
+console.log(proxy.foo); // Hello, foo
+proxy.foo = 1;
+console.log(proxy.foo); */ // Hello, foo
+
+// 5，实例：Web 服务的客户端
+// Proxy 对象可以拦截目标对象的任意属性，这使得它很合适用来写 Web 服务的客户端

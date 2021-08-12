@@ -43,6 +43,31 @@
       console.log([...URLp]); // [Array(2), Array(2), Array(2)]
       console.log(new Map(URLp)); // {"foo" => "bar", "baz" => "qux", "yy" => ""}
       console.log(Object.fromEntries(URLp)); // {foo: "bar", baz: "qux", yy: ""}
+
+      console.log("--------------------------------------------------");
+      // 使用Object.keys()方法时，有三类属性会被ownKeys()方法自动过滤，不会返回。
+      /*   目标对象上不存在的属性
+          属性名为 Symbol 值
+          不可遍历（enumerable）的属性 */
+      let target = {
+        a: 1,
+        b: 2,
+        c: 3,
+        [Symbol.for("secret")]: "4"
+      };
+      Object.defineProperty(target, "key", {
+        enumerable: false,
+        configurable: true,
+        writable: true,
+        value: "static"
+      });
+      let handler = {
+        ownKeys(target) {
+          return Object.keys(target);
+        }
+      };
+      let proxy = new Proxy(target, handler);
+      console.log(Object.keys(proxy)); // ["a", "b", "c"]
     </script>
   </body>
 </html>
