@@ -140,6 +140,35 @@ console.log(proxy.ww); */
 // 注意，如果目标对象自身的某个属性不可写，那么set方法将不起作用。
 // 注意，set代理应当返回一个布尔值。严格模式下，set代理如果没有返回true，就会报错
 
+{
+  // set方法第四个参数的例子。
+  const handler = {
+    set: function (obj, prop, value, receiver) {
+      obj[prop] = receiver;
+      return true;
+    }
+  };
+  const proxy = new Proxy({}, handler);
+  proxy.foo = "bar";
+  console.log(proxy.foo === proxy); // true
+  // set方法的第四个参数receiver，指的是原始的操作行为所在的那个对象，一般情况下是proxy实例本身，
+
+  /* const handler = {
+    set: function (obj, prop, value, receiver) {
+      obj[prop] = receiver;
+      return true;
+    }
+  };
+  const proxy = new Proxy({}, handler);
+  const myObj = {};
+  Object.setPrototypeOf(myObj, proxy);
+  myObj.foo = "bar";
+  console.log(myObj.foo === myObj); */ // true
+  // 设置myObj.foo属性的值时，myObj并没有foo属性，因此引擎会到myObj的原型链去找foo属性。myObj的原型对象proxy是一个 Proxy 实例，设置它的foo属性会触发set方法。这时，第四个参数receiver就指向原始赋值行为所在的对象myObj。
+
+  console.log("99---");
+}
+
 // apply() ----
 // apply方法拦截函数的调用、call和apply操作。
 // apply方法可以接受三个参数，分别是目标对象、目标对象的上下文对象（this）和目标对象的参数数组。
