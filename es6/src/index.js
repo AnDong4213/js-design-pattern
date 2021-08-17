@@ -8,4 +8,6 @@
 
 // import "./es/15-proxy.js";
 
-import "./es/16-reflect";
+// import "./es/16-reflect";
+
+import "./es/17-promise";
