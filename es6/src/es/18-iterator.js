@@ -303,8 +303,7 @@ console.log("---------------------------------------------");
 
   let fibonacci = {
     [Symbol.iterator]() {
-      let pre = 0,
-        cur = 1;
+      let [pre, cur] = [0, 1];
       return {
         next() {
           [pre, cur] = [cur, pre + cur];
