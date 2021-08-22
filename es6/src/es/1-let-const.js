@@ -24,7 +24,7 @@
 {
   let a = [];
   for (let i = 0; i < 10; i++) {
-    a[i] = function () {
+    a[i] = function() {
       console.log(i);
     };
   }
@@ -186,4 +186,20 @@ const s = new Set();
 
 for (let i of s) {
   console.log(i);
+}
+
+console.log('--------------------------------------------');
+// ES5 规定，函数只能在顶层作用域和函数作用域之中声明，不能在块级作用域声明。
+// ES6 引入了块级作用域，明确允许在块级作用域之中声明函数。ES6 规定，块级作用域之中，函数声明语句的行为类似于let，在块级作用域之外不可引用。
+{
+  var yy = 1110
+
+  function aa() { // 函数声明语句的行为类似于let，在块级作用域之外不可引用。
+    console.log(99);
+  }
+}
+
+{
+  console.log(yy); // 可以引用
+  // aa() 不可引用。
 }

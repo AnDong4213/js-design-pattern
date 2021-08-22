@@ -10,6 +10,8 @@
 
 // import "./es/16-reflect";
 
-import "./es/17-promise";
+// import "./es/17-promise";
 
-import "./es/18-iterator";
+// import "./es/18-iterator";
+
+import "./es/19-generator";

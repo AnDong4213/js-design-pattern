@@ -242,6 +242,11 @@ console.log("---------------------------------------------");
     }
   };
   console.log(...myIterable);
+  const gf = myIterable[Symbol.iterator]();
+  console.log(gf.next());
+  console.log(gf.next());
+  console.log(gf.next());
+  console.log(gf.next()); // {value: undefined, done: true}
   let obj = {
     *[Symbol.iterator]() {
       yield "hello";
