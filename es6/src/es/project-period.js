@@ -16,7 +16,6 @@ let name =
   "权限都没了,还有jB面子啊！现在咱师傅二人穷的都尿血了啊,给咱刷钱的就是咱爹,别jB这么多废话";
 let word = ["尿血", "废", "jB", "师傅"];
 
-console.log(name.length);
 console.time("aaa");
 export const stringToArr = (nameStr, keyword) => {
   let splitWords = [];
@@ -50,14 +49,13 @@ export const stringToArr = (nameStr, keyword) => {
 
   return splitWords;
 };
-console.log(stringToArr(name, word));
+// console.log(stringToArr(name, word));
 console.timeEnd("aaa");
 
 {
   function makeRandomArr(arrList, num) {
     if (num > arrList.length) {
-      `
-      return [];`;
+      return [];
     }
     let tempArr = arrList.slice(0);
     let newArrList = [];

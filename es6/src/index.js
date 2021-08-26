@@ -24,4 +24,6 @@
 
 import "./es/25-module-load-implement";
 
+import "./es/26-programming-style";
+
 // import "./es/31-decorator";
