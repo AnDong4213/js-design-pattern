@@ -2,15 +2,23 @@
 // 装饰器是一种函数，写成 @ + 函数名。它可以放在类和类方法的定义前面。
 
 {
+  const testable = (target) => {
+    console.log(target); // 装饰器是一个对类进行处理的函数。装饰器函数的第一个参数，就是所要装饰的目标类。
+    target.isTestable = false;
+  };
   @testable
   class MyTestableClass {
     static age = 9;
   }
+  /* let testable = (target) => {  Uncaught ReferenceError: Cannot access 'testable' before initialization
+    console.log(target);
+    target.isTestable = false;
+  }; */
 
-  function testable(target) {
+  /* function testable(target) {
     console.log(target); // 装饰器是一个对类进行处理的函数。装饰器函数的第一个参数，就是所要装饰的目标类。
     target.isTestable = true;
-  }
+  } */
 
   console.log(MyTestableClass.isTestable);
   console.log(MyTestableClass.age); // 9
@@ -43,6 +51,7 @@ console.log("------------========---------------");
 {
   // 如果觉得一个参数不够用，可以在装饰器外面再封装一层函数。
   // 装饰器对类的行为的改变，是代码编译时发生的，而不是在运行时。这意味着，装饰器能在编译阶段运行代码。也就是说，装饰器本质就是编译时执行的函数。
+
   // 是为类添加一个静态属性，如果想添加实例属性，可以通过目标类的prototype对象操作。
   function testable(isTestable) {
     return function (target) {
@@ -136,4 +145,48 @@ console.log("------------========-------------");
   }
   const math = new Math();
   console.log(math.add(2, 4));
+
+  // 果同一个方法有多个装饰器，会像剥洋葱一样，先从外到内进入，然后由内向外执行
 }
+console.log("------------========-------------");
+{
+  // 3，为什么装饰器不能用于函数？
+  // 装饰器只能用于类和类的方法，不能用于函数，因为存在函数提升。  总之，由于存在函数提升，使得装饰器不能用于函数。类是不会提升的，所以就没有这方面的问题。
+  // 如果一定要装饰函数，可以采用高阶函数的形式直接执行。
+  function doSomething(name) {
+    console.log("Hello, " + name);
+  }
+
+  function loggingDecorator(wrapped) {
+    return function (...args) {
+      console.log("Starting");
+      const result = wrapped.apply(this, args);
+      console.log("Finished");
+      return result;
+    };
+  }
+  const wrapped = loggingDecorator(doSomething);
+  wrapped(99);
+}
+
+console.log("------------========-------------");
+{
+  // 6，Mixin
+  // 在装饰器的基础上，可以实现 Mixin模式。所谓 Mixin模式，就是对象继承的一种替代方案，中文译为“混入”（mix in），意为在一个对象之中混入另外一个对象的方法。
+  class MyBaseClass {}
+
+  let MyMixin = (superclass) =>
+    class extends superclass {
+      foo() {
+        console.log("foo from MyMixin");
+      }
+    };
+  class MyClass extends MyMixin(MyBaseClass) {
+    /* ... */
+  }
+
+  let c = new MyClass();
+  c.foo();
+}
+
+console.log(this);

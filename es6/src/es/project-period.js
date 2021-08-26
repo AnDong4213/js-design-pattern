@@ -1,42 +1,63 @@
-{
-  function compare(property) {
-    return function (a, b) {
-      var value1 = a[property];
-      var value2 = b[property];
-      return value1 - value2; //升序排序
-    };
-  }
-  let name = "近期购车需要留个心眼，水泡车尽量不要碰，你都知道吗？";
-  let word = ["泡车", "期", "需要"];
+/*jshint esversion: 6 */
 
-  const stringToArr = (nameStr, keyword) => {
-    let splitWords = [];
-    let sortWord = keyword.map((key) => ({
-      key,
-      num: nameStr.search(key)
-    }));
-    sortWord.sort(compare("num"));
-    let newKeyword = sortWord.map((n) => n.key);
-
-    for (let key of newKeyword) {
-      let sName = nameStr.split(key);
-      splitWords.push(sName[0]);
-      splitWords.push(key);
-      if (key === newKeyword.slice(-1)[0]) {
-        splitWords.push(sName[1]);
-      }
-      nameStr = nameStr.substr(nameStr.search(key) + key.length);
-    }
-
-    return splitWords;
+const compare = (property) => {
+  return function (a, b) {
+    var value1 = a[property];
+    var value2 = b[property];
+    return value1 - value2; //升序排序
   };
-  console.log(stringToArr(name, word));
-}
+};
+/* console.log(
+  "权限都没了,还有jB面子啊！现在咱师傅二人穷的都尿血了啊,给咱刷钱的就是咱爹,别"
+    .length
+); */
+
+let name =
+  "权限都没了,还有jB面子啊！现在咱师傅二人穷的都尿血了啊,给咱刷钱的就是咱爹,别jB这么多废话";
+let word = ["尿血", "废", "jB", "师傅"];
+
+console.log(name.length);
+console.time("aaa");
+export const stringToArr = (nameStr, keyword) => {
+  let splitWords = [];
+  let posSet = new Set();
+  let sortWord = [];
+  keyword = [...new Set(keyword)];
+  for (let key of keyword) {
+    for (let value of [...nameStr.matchAll(new RegExp(key, "g"))]) {
+      posSet.add(value);
+    }
+  }
+  posSet.forEach((set) => {
+    sortWord.push({
+      key: set[0],
+      num: set.index
+    });
+  });
+
+  sortWord.sort((a, b) => a.num - b.num);
+  let newKeyword = sortWord.map((n) => n.key);
+
+  newKeyword.forEach((key, index) => {
+    let sName = nameStr.split(key);
+    splitWords.push(sName[0]);
+    splitWords.push(key);
+    if (index === newKeyword.length - 1) {
+      splitWords.push(sName[1]);
+    }
+    nameStr = nameStr.substr(nameStr.indexOf(key) + key.length);
+  });
+
+  return splitWords;
+};
+console.log(stringToArr(name, word));
+console.timeEnd("aaa");
 
 {
   function makeRandomArr(arrList, num) {
     if (num > arrList.length) {
-      return [];
+      `
+      return [];`;
     }
     let tempArr = arrList.slice(0);
     let newArrList = [];
@@ -49,5 +70,5 @@
     return newArrList;
   }
   const aa = ["不知道", "以前", "的提案已经有点 ", "不知道6"];
-  console.log(makeRandomArr(aa, 3));
+  // console.log(makeRandomArr(aa, 3));
 }

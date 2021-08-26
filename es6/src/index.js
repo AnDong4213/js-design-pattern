@@ -20,4 +20,8 @@
 
 // import "./es/19-generator";
 
-import "./es/31-decorator";
+// import "./es/24-module-syntax";
+
+import "./es/25-module-load-implement";
+
+// import "./es/31-decorator";
