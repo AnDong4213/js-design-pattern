@@ -18,6 +18,20 @@
       // import { makeRandomArr } from "/index.js";  // 要放到 release 文件夹下
       // console.log(makeRandomArr(["a", "b", "c"], 2));
     </script>
+    <script>
+      console.log("-------------------------------");
+      function foo() {
+        console.log(a); // 2
+      }
+      function bar() {
+        var a = 3;
+        foo();
+      }
+      var a = 2;
+      // bar();
+      // var a = 2;
+      // foo在bar的作用域下运行,bar运行在全局作用域下
+    </script>
   </head>
 
   <body>

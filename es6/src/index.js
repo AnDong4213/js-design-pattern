@@ -20,10 +20,14 @@
 
 // import "./es/19-generator";
 
+// import "./es/22-class-basic-grammar";
+
+import "./es/23-class-inherit";
+
 // import "./es/24-module-syntax";
 
-import "./es/25-module-load-implement";
+// import "./es/25-module-load-implement";
 
-import "./es/26-programming-style";
+// import "./es/26-programming-style";
 
 // import "./es/31-decorator";
