@@ -49,6 +49,7 @@ console.log(Math.max(...[111, 1, 24, 5])); */
 // 将数组中的空值，转化成undefined,主要应用在数组遍历中，因为数组foreach 遍历会跳过空值，而不会跳过undefined
 /* var a = ["a", , "b"];
 console.log(Array.apply(null, a)); */ // ["a", undefined, "b"]
+console.log("Array", typeof Array); // Array function
 
 /* console.log(Array.prototype.slice.apply({ length: 4 })); // [empty × 4]
 const aaa = Array.prototype.slice.apply({ 2: "a", 6: "b", length: 8 });
@@ -230,3 +231,98 @@ Object.defineProperties(obj, {
   }
 });
 console.log(obj.property2); */ // Hello
+
+window.aa = function (s) {
+  console.log(s);
+};
+aa(88);
+
+class jQuery {
+  constructor(selector) {
+    let dom = Array.from(document.querySelectorAll(selector));
+    let len = dom ? dom.length : 0;
+    for (let i = 0; i < len; i++) {
+      this[i] = dom[i];
+    }
+    this.length = len;
+    this.selector = selector || "";
+  }
+
+  append(node) {}
+  addClass(name) {}
+  html() {}
+}
+
+window.$ = function (selector) {
+  return new jQuery(selector);
+};
+
+console.log($("h1"));
+
+/* let obj = {
+  part1: {
+    name: "安东",
+    age: 2
+  }
+};
+const {
+  part1: { name, age }
+} = obj;
+console.log(name, age); */
+
+// 数字分隔符整起来
+const myMoney = 1_00_100_00_00;
+console.log(myMoney);
+
+// 普通函数调用中，return 一般会提前结束函数的执行，而在  try...catch...finally 中，return 就不会提前结束执行
+/* function demo() {
+  try {
+    return 1;
+  } catch (err) {
+    console.log(err);
+    return 2;
+  } finally {
+    return 3;
+  }
+}
+console.log(demo());  */ // 3
+
+function demo() {
+  try {
+    return 1;
+  } catch (err) {
+    console.log(err);
+    return 2;
+  } finally {
+    try {
+      return 3;
+    } finally {
+      return 4;
+    }
+  }
+}
+console.log(demo()); // 4
+
+// 四、获取当前调用栈
+// new Error().stack 这样就能随时获取到当前代码执行的调用栈信息，也不失一种调试代码的办法
+function firstFunction() {
+  secondFunction();
+}
+function secondFunction() {
+  thridFunction();
+}
+function thridFunction() {
+  console.log(new Error().stack);
+}
+firstFunction();
+
+// 五、一行代码生成随机字符串
+// const str = Math.random().toString(36).substr(2, 10);
+const str = Math.random().toString(36).slice(-10);
+console.log(str);
+// 先是 Math.random() 生成 [0, 1) 的数，也就是 0.123312、0.982931之类的，然后调用 number 的 toString方法将其转换成36进制的，按照MDN的说法，36进制的转换应该是包含了字母 a~z 和 数字0~9的，因为这样生成的是 0.89kjna21sa 类似这样的，所以要截取一下小数部分，即从索引 2 开始截取10个字符就是我们想要的随机字符串了
+
+// 六、最快获取dom的方法，HTML中带有 id 属性的元素，都会被全局的 ID 同名变量所引用
+// 原本获取 dom 是这样的  document.getElementById('zeroh1')
+// 现在可以这样
+console.log(zeroh1.textContent); // textContent属性可以获取或更新包含元素（及其子元素）中的文本。
