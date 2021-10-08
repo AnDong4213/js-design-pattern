@@ -13,6 +13,10 @@ console.log("inherit");
       return this.color + " " + super.toString(); // 调用父类的toString()
     }
   }
+  const aCP = new ColorPoint(1, 2, "red");
+  console.log(aCP);
+  console.log(aCP.__proto__.__proto__ === Point.prototype); // true
+  console.log(aCP instanceof Point); // true
   // Object.getPrototypeOf方法可以用来从子类上获取父类。
   console.log(Object.getPrototypeOf(ColorPoint) === Point); // true
 
@@ -50,4 +54,90 @@ console.log("inherit");
     RegExp()
     Error()
     Object() */
+}
+
+{
+  /* var MyCircularQueue = function (k) {
+    this.queue = new Array(k);
+  };
+
+  MyCircularQueue.prototype.enQueue = function (value) {
+    console.log("enQueue");
+    this.deQueue();
+  };
+
+  MyCircularQueue.prototype.deQueue = function () {
+    console.log("deQueue");
+  };
+  const hh = new MyCircularQueue(4);
+  console.log(hh.queue);
+  hh.enQueue(); */
+
+  // 循环队列
+  class MyCircularQueue {
+    constructor(k) {
+      this.queue = new Array(k);
+      this.front = 0;
+      this.rear = 0;
+      this.max = k;
+    }
+
+    enQueue(value) {
+      if (this.isFull()) {
+        return false;
+      } else {
+        this.queue[this.rear] = value;
+        this.rear = (this.rear + 1) % this.max;
+        return true;
+      }
+    }
+    deQueue() {
+      if (!this.isEmpty()) {
+        this.queue[this.front] = "";
+        this.front = (this.front + 1) % this.max;
+        return true;
+      } else {
+        return false;
+      }
+    }
+    Front() {
+      if (this.isEmpty()) {
+        return -1;
+      } else {
+        return this.queue[this.front];
+      }
+    }
+    Rear() {
+      if (this.isEmpty()) {
+        return -1;
+      } else {
+        let rear = this.rear - 1;
+        return this.queue[rear < 0 ? this.max - 1 : rear];
+      }
+    }
+    isEmpty() {
+      return this.front === this.rear && !this.queue[this.front];
+    }
+    isFull() {
+      return this.front === this.rear && !!this.queue[this.front];
+    }
+  }
+  const vv = new MyCircularQueue(5);
+  vv.enQueue(1);
+  vv.enQueue(2);
+  vv.enQueue(3);
+  vv.enQueue(4);
+  vv.enQueue(5);
+  console.log(vv.queue);
+  console.log(vv.front);
+  console.log(vv.rear);
+  vv.deQueue();
+  vv.deQueue();
+  console.log(vv.queue);
+  console.log(vv.front);
+  console.log(vv.rear);
+  vv.enQueue(6);
+  console.log(vv.queue);
+  console.log(vv.front);
+  console.log(vv.rear);
 }
