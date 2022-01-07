@@ -21,16 +21,42 @@
     <script>
       console.log("-------------------------------");
       function foo() {
-        console.log(a); // 2
+        console.log(a); // 23
       }
       function bar() {
         var a = 3;
+        console.log(a);
         foo();
+        console.log(a);
+        function bb() {
+          console.log(a);
+        }
+        bb();
       }
-      var a = 2;
+      var a = 23;
       // bar();
       // var a = 2;
       // foo在bar的作用域下运行,bar运行在全局作用域下
+      /* var obj = {
+        emj: "6",
+        f: function () {
+          console.log(this.emj);
+        }
+      };
+      obj.f(); // （1）  6
+      var emj = "9";
+      var f = obj.f;
+      f(); // (2)  9
+      console.log(this.emj); // (3) 9
+      obj.f(); // （4）6 */
+
+      let username = "cn";
+      function fn() {
+        console.log(this.username); //undefined
+      }
+      // fn();
+
+      // 关于 this 的指向，记住最核心的一句话：哪个对象调用函数，函数里面的this指向哪个对象。
     </script>
   </head>
 

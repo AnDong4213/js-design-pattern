@@ -15,7 +15,7 @@
   // 3, export 命令
   // 模块功能主要由两个命令构成：export和import。export命令用于规定模块的对外接口，import命令用于输入其他模块提供的功能。
   // 一个模块就是一个独立的文件。该文件内部的所有变量，外部无法获取。如果你希望外部能够读取模块内部的某个变量，就必须使用export关键字输出该变量。
-  console.log(99);
+  console.log(989);
 
   // export输出的变量就是本来的名字，但是可以使用as关键字重命名。
   /* function v1() {}
@@ -28,8 +28,9 @@ var m = 1;
 export default m;
 
 // import命令具有提升效果，会提升到整个模块的头部，首先执行。
-console.log(stringToArr("128390", ["2", "8"]));
+// console.log(stringToArr("128390", ["2", "8"]));
 import { stringToArr } from "./project-period";
+// console.log(stringToArr("个回复的点击", ["点"]));
 // 上面的代码不会报错，因为import的执行早于stringToArr的调用。这种行为的本质是，import命令是编译阶段执行的，在代码运行之前。
 
 // 如果多次重复执行同一句import语句，那么只会执行一次，而不会执行多次。  import语句是 Singleton 模式。

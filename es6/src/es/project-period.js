@@ -22,6 +22,7 @@ export const stringToArr = (nameStr, keyword) => {
   let posSet = new Set();
   let sortWord = [];
   keyword = [...new Set(keyword)];
+
   for (let key of keyword) {
     for (let value of [...nameStr.matchAll(new RegExp(key, "g"))]) {
       posSet.add(value);
@@ -36,6 +37,7 @@ export const stringToArr = (nameStr, keyword) => {
 
   sortWord.sort((a, b) => a.num - b.num);
   let newKeyword = sortWord.map((n) => n.key);
+  console.log(newKeyword);
 
   newKeyword.forEach((key, index) => {
     let sName = nameStr.split(key);
@@ -44,12 +46,12 @@ export const stringToArr = (nameStr, keyword) => {
     if (index === newKeyword.length - 1) {
       splitWords.push(sName[1]);
     }
-    nameStr = nameStr.substr(nameStr.indexOf(key) + key.length);
+    nameStr = nameStr.substring(nameStr.indexOf(key) + key.length);
   });
 
   return splitWords;
 };
-// console.log(stringToArr(name, word));
+console.log(stringToArr(name, word));
 console.timeEnd("aaa");
 
 {
